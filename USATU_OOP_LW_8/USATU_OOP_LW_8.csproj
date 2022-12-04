@@ -60,6 +60,7 @@
         <Compile Include="GraphicObjectsFactory.cs" />
         <Compile Include="GraphicObjectsHandler.cs" />
         <Compile Include="GraphicObjectsList.cs" />
+        <Compile Include="GraphicObjectsListObserver.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="StorageTools.cs" />

@@ -1,32 +1,52 @@
 ﻿using System;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace USATU_OOP_LW_8;
 
 public class GraphicObjectsHandler
 {
-    private readonly GraphicObjectsList _graphicObjects = new();
+    public delegate void OnTreeNeedUpdate(TreeNode treeNode);
+    public event OnTreeNeedUpdate TreeNeedUpdate;
+    
+    private GraphicObjectsList _graphicObjects = new();
     private bool _isMultipleSelectionEnabled;
     private readonly Size _backgroundSize;
     private readonly GraphicObjectsAbstractFactory _graphicObjectsFactory = new GraphicObjectsFactory();
-    private readonly StorageTools _storageTools;
+    private StorageTools _storageTools;
+    private GraphicObjectsListObserverTreeViewUpdater _graphicObjectsListObserver;
 
-    public GraphicObjectsHandler(Size backgroundSize, string selectedFile)
+    public GraphicObjectsHandler(Size backgroundSize)
     {
         _backgroundSize = backgroundSize;
+    }
+
+    public void ReadDataFromStorage(string selectedFile)
+    {
         _storageTools = new StorageTools(selectedFile);
-        if (_storageTools.IsFileExists())
+        if (!_storageTools.IsFileExists()) return;
+        try
         {
-            try
-            {
-                _graphicObjects.ParseGraphicObjects(_storageTools.GetFormattedDataFromStorage(),
-                    _graphicObjectsFactory);
-            }
-            catch (Exception e)
-            {
-                // ignored
-            }
+            _graphicObjectsListObserver = new GraphicObjectsListObserverTreeViewUpdater(_graphicObjects);
+            _graphicObjectsListObserver.TreeNeedUpdate += ThrowTreeUpdate;
+            _graphicObjects.ParseGraphicObjects(_storageTools.GetFormattedDataFromStorage(),
+                _graphicObjectsFactory);
         }
+        catch (Exception)
+        {
+            // ignored
+        }
+        _graphicObjectsListObserver.UpdateChanges();
+    }
+
+    private void ThrowTreeUpdate(TreeNode treeNode)
+    {
+        TreeNeedUpdate?.Invoke(treeNode);
+    }
+
+    public void ProcessTreeActionToObjects(TreeNode selectedNode, bool isChecked)
+    {
+        _graphicObjectsListObserver.ProcessTreeActionToObjects(selectedNode, isChecked);
     }
 
     public void JoinSelectedGraphicObject()
@@ -48,6 +68,7 @@ public class GraphicObjectsHandler
 
         _graphicObjects.Add(newGraphicObjectGroup);
         UnselectAll();
+        _graphicObjectsListObserver.UpdateChanges();
     }
 
     public void SeparateSelectedGraphicObjects()
@@ -63,6 +84,7 @@ public class GraphicObjectsHandler
         }
 
         UnselectAll();
+        _graphicObjectsListObserver.UpdateChanges();
     }
 
     public void DrawOnGraphics(Graphics graphics)
@@ -97,6 +119,7 @@ public class GraphicObjectsHandler
                 }
 
                 i.Current.ProcessClick();
+                _graphicObjectsListObserver.UpdateChanges();
                 break;
             }
         }
@@ -129,6 +152,7 @@ public class GraphicObjectsHandler
         }
 
         UnselectAll();
+        _graphicObjectsListObserver.UpdateChanges();
     }
 
     public void ProcessColorClick(Point clickLocation, Color color)
@@ -197,6 +221,7 @@ public class GraphicObjectsHandler
                 _graphicObjects.RemovePointerElement(i);
             }
         }
+        _graphicObjectsListObserver.UpdateChanges();
     }
 
     public void StoreData()
@@ -206,12 +231,19 @@ public class GraphicObjectsHandler
 
     private void UnselectAll()
     {
+        bool needObserverUpdate = false;
         for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
             if (i.Current.IsObjectSelected())
             {
                 i.Current.Unselect();
+                needObserverUpdate = true;
             }
+        }
+
+        if (needObserverUpdate)
+        {
+            _graphicObjectsListObserver.UpdateChanges();
         }
     }
 
