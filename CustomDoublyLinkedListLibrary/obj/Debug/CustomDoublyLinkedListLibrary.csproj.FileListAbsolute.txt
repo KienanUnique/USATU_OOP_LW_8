@@ -1,0 +1,6 @@
+C:\Users\wi\RiderProjects\USATU_OOP_LW_8\CustomDoublyLinkedListLibrary\bin\Debug\CustomDoublyLinkedListLibrary.dll
+C:\Users\wi\RiderProjects\USATU_OOP_LW_8\CustomDoublyLinkedListLibrary\bin\Debug\CustomDoublyLinkedListLibrary.pdb
+C:\Users\wi\RiderProjects\USATU_OOP_LW_8\CustomDoublyLinkedListLibrary\obj\Debug\CustomDoublyLinkedListLibrary.csproj.AssemblyReference.cache
+C:\Users\wi\RiderProjects\USATU_OOP_LW_8\CustomDoublyLinkedListLibrary\obj\Debug\CustomDoublyLinkedListLibrary.csproj.CoreCompileInputs.cache
+C:\Users\wi\RiderProjects\USATU_OOP_LW_8\CustomDoublyLinkedListLibrary\obj\Debug\CustomDoublyLinkedListLibrary.dll
+C:\Users\wi\RiderProjects\USATU_OOP_LW_8\CustomDoublyLinkedListLibrary\obj\Debug\CustomDoublyLinkedListLibrary.pdb
