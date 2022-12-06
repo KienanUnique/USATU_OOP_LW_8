@@ -15,7 +15,7 @@ public class GraphicObjectsList : CustomDoublyLinkedList<GraphicObject>
         for (int i = 0; i < countOfElements; i++)
         {
             var readObject = graphicObjectsAbstractFactory.ParseGraphicObject(dataStringReader.ReadLine());
-            readObject.loadData(dataStringReader);
+            readObject.LoadData(dataStringReader);
             Add(readObject);
         }
     }

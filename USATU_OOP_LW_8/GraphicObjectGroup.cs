@@ -1,12 +1,12 @@
 ﻿using System.Drawing;
 using System.IO;
 using System.Text;
-using CustomDoublyLinkedListLibrary;
 
 namespace USATU_OOP_LW_8
 {
     public class GraphicObjectGroup : GraphicObject
     {
+        protected override string NamePrefix => "Group";
         private readonly GraphicObjectsList _graphicObjects = new();
         private readonly GraphicObjectsAbstractFactory _graphicObjectsFactory;
 
@@ -16,7 +16,7 @@ namespace USATU_OOP_LW_8
             IsSelected = false;
         }
 
-        public override void loadData(StringReader dataStringReader)
+        public override void LoadData(StringReader dataStringReader)
         {
             _graphicObjects.ParseGraphicObjects(dataStringReader, _graphicObjectsFactory);
             IsSelected = false;
@@ -142,7 +142,7 @@ namespace USATU_OOP_LW_8
             return dataStringBuilder.ToString();
         }
 
-        public CustomDoublyLinkedList<GraphicObject> GetAllGraphicObjects()
+        public GraphicObjectsList GetAllGraphicObjects()
         {
             return _graphicObjects;
         }
@@ -151,6 +151,15 @@ namespace USATU_OOP_LW_8
         {
             newGraphicObject.Unselect();
             _graphicObjects.Add(newGraphicObject);
+        }
+
+        public void ReturnAllIdsToBank()
+        {
+            for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
+            {
+                i.Current.ReturnIdToBank();
+            }
+            base.ReturnIdToBank();
         }
 
         private void ChangeAllSelection(bool newIsSelected)

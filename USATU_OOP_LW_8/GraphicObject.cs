@@ -11,7 +11,9 @@ public enum ResizeAction
 
 public abstract class GraphicObject
 {
+    public readonly int Id = BankOfIds.GetInstance().GetId();
     protected bool IsSelected;
+    protected abstract string NamePrefix { get; }
     protected const string PrefixGraphicObjectsType = "Type: ";
     public abstract bool IsFigureOutside(Size backgroundSize);
     public abstract void Color(Color newColor);
@@ -27,5 +29,14 @@ public abstract class GraphicObject
     public abstract bool IsPointInside(Point pointToCheck);
     public abstract bool IsGroup();
     public abstract string PrepareDataToStore();
-    public abstract void loadData(StringReader dataStringReader);
+    public abstract void LoadData(StringReader dataStringReader);
+
+    public string GetName()
+    {
+        return NamePrefix + " (" + Id + ")";
+    }
+    public void ReturnIdToBank()
+    {
+        BankOfIds.GetInstance().ReturnId(Id);
+    }
 }

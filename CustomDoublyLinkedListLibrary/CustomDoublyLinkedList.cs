@@ -1,4 +1,6 @@
-﻿namespace CustomDoublyLinkedListLibrary
+﻿using System;
+
+namespace CustomDoublyLinkedListLibrary
 {
     public class CustomDoublyLinkedList<T>
     {
@@ -83,8 +85,9 @@
             Count++;
         }
 
-        public void RemovePointerElement(PointerCustomDoublyLinkedList<T> pointer)
+        public virtual void RemovePointerElement(PointerCustomDoublyLinkedList<T> pointer)
         {
+            pointer.CurrentElement.Object = default;
             switch (pointer.CurrentElement.Next.IsBorder)
             {
                 case true when !pointer.CurrentElement.Previous.IsBorder:
@@ -105,6 +108,8 @@
 
             pointer.CurrentElement.Previous.Next = pointer.CurrentElement.Next;
             pointer.CurrentElement.Next.Previous = pointer.CurrentElement.Previous;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             Count--;
         }
 

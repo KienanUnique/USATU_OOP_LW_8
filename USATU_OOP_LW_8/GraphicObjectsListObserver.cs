@@ -62,7 +62,7 @@ public class GraphicObjectsListObserverTreeViewUpdater
                 tmpTreeNode = ConvertCustomListToTreeNodes(currentGroupList.GetPointerOnBeginning());
             }
 
-            tmpTreeNode.Text = pointer.Current.GetType().Name;
+            tmpTreeNode.Text = pointer.Current.GetName();
             tmpTreeNode.Checked = pointer.Current.IsObjectSelected();
             newTreeNode.Nodes.Add(tmpTreeNode);
         }

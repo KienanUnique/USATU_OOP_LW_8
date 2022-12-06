@@ -7,8 +7,9 @@ namespace USATU_OOP_LW_8;
 public class GraphicObjectsHandler
 {
     public delegate void OnTreeNeedUpdate(TreeNode treeNode);
+
     public event OnTreeNeedUpdate TreeNeedUpdate;
-    
+
     private GraphicObjectsList _graphicObjects = new();
     private bool _isMultipleSelectionEnabled;
     private readonly Size _backgroundSize;
@@ -36,6 +37,7 @@ public class GraphicObjectsHandler
         {
             // ignored
         }
+
         _graphicObjectsListObserver.UpdateChanges();
     }
 
@@ -79,6 +81,7 @@ public class GraphicObjectsHandler
             {
                 var currentGroupList = ((GraphicObjectGroup) i.Current).GetAllGraphicObjects();
                 _graphicObjects.InsertListBeforePointer(currentGroupList, i);
+                i.Current.ReturnIdToBank();
                 _graphicObjects.RemovePointerElement(i);
             }
         }
@@ -218,9 +221,16 @@ public class GraphicObjectsHandler
         {
             if (i.Current.IsObjectSelected())
             {
+                if (i.Current.IsGroup())
+                {
+                    var currentGroup = ((GraphicObjectGroup) i.Current);
+                    currentGroup.ReturnAllIdsToBank();
+                }
+
                 _graphicObjects.RemovePointerElement(i);
             }
         }
+
         _graphicObjectsListObserver.UpdateChanges();
     }
 

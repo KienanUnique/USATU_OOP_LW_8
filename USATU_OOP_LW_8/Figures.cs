@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Text;
 
@@ -37,10 +38,10 @@ namespace USATU_OOP_LW_8
     {
         protected Rectangle FigureRectangle;
         protected readonly SolidBrush CurrentBrush;
-        protected abstract GraphicObjectsTypes GraphicObjectsTypeType { get; }
+        protected abstract GraphicObjectsTypes GraphicObjectsType { get; }
 
         private readonly Size _defaultSize = new Size(50, 50);
-        private readonly Point _defaultLocation = new Point(0,0);
+        private readonly Point _defaultLocation = new Point(0, 0);
         private readonly Color _defaultColor = System.Drawing.Color.Black;
         private readonly Size _minimumSize = new Size(10, 10);
 
@@ -51,10 +52,14 @@ namespace USATU_OOP_LW_8
         private const string PrefixColor = "Color: ";
         private const string PrefixFigureType = "Figure type: ";
 
-        public Figure()
+        protected Figure()
         {
             FigureRectangle = new Rectangle(_defaultLocation, _defaultSize);
             CurrentBrush = new SolidBrush(_defaultColor);
+        }
+
+        ~Figure()
+        {
         }
 
         protected Figure(Color color, Point centerLocation)
@@ -65,7 +70,7 @@ namespace USATU_OOP_LW_8
             CurrentBrush = new SolidBrush(color);
         }
 
-        public override void loadData(StringReader dataStringReader)
+        public override void LoadData(StringReader dataStringReader)
         {
             int.TryParse(dataStringReader.ReadLine(), out int readWidth);
             int.TryParse(dataStringReader.ReadLine(), out int readHeight);
@@ -189,7 +194,7 @@ namespace USATU_OOP_LW_8
         public override string PrepareDataToStore()
         {
             var dataStringBuilder = new StringBuilder();
-            dataStringBuilder.AppendLine(PrefixFigureType + GraphicObjectsTypeType);
+            dataStringBuilder.AppendLine(PrefixFigureType + GraphicObjectsType);
             dataStringBuilder.AppendLine(PrefixSizeWidth + FigureRectangle.Size.Width);
             dataStringBuilder.AppendLine(PrefixSizeHeight + FigureRectangle.Size.Height);
             dataStringBuilder.AppendLine(PrefixLeftTopPointX + FigureRectangle.Location.X);
@@ -201,7 +206,8 @@ namespace USATU_OOP_LW_8
 
     public class Circle : Figure
     {
-        protected override GraphicObjectsTypes GraphicObjectsTypeType => GraphicObjectsTypes.Circle;
+        protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.Circle;
+        protected override string NamePrefix => "Circle";
 
         public Circle(Color color, Point location) : base(color, location)
         {
@@ -209,7 +215,6 @@ namespace USATU_OOP_LW_8
 
         public Circle() : base()
         {
-            
         }
 
         public override bool IsPointInside(Point pointToCheck)
@@ -228,15 +233,15 @@ namespace USATU_OOP_LW_8
 
     public class Square : Figure
     {
-        protected override GraphicObjectsTypes GraphicObjectsTypeType => GraphicObjectsTypes.Square;
+        protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.Square;
+        protected override string NamePrefix => "Square";
 
         public Square(Color color, Point location) : base(color, location)
         {
         }
-        
+
         public Square() : base()
         {
-            
         }
 
         public override bool IsPointInside(Point pointToCheck)
@@ -252,15 +257,15 @@ namespace USATU_OOP_LW_8
 
     public class Triangle : Figure
     {
-        protected override GraphicObjectsTypes GraphicObjectsTypeType => GraphicObjectsTypes.Triangle;
+        protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.Triangle;
+        protected override string NamePrefix => "Triangle";
 
         public Triangle(Color color, Point location) : base(color, location)
         {
         }
-        
+
         public Triangle() : base()
         {
-            
         }
 
         public override bool IsPointInside(Point pointToCheck)
@@ -283,12 +288,13 @@ namespace USATU_OOP_LW_8
 
     public class Pentagon : Figure
     {
-        protected override GraphicObjectsTypes GraphicObjectsTypeType => GraphicObjectsTypes.Pentagon;
+        protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.Pentagon;
+        protected override string NamePrefix => "Pentagon";
 
         public Pentagon(Color color, Point location) : base(color, location)
         {
         }
-        
+
         public Pentagon() : base()
         {
         }
