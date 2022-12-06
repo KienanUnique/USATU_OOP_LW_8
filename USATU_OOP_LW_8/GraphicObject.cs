@@ -35,7 +35,7 @@ public abstract class GraphicObject
     {
         return NamePrefix + " (" + Id + ")";
     }
-    public void ReturnIdToBank()
+    public virtual void ReturnIdToBank()
     {
         BankOfIds.GetInstance().ReturnId(Id);
     }

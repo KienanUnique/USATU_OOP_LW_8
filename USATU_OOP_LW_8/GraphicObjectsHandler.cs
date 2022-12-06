@@ -26,8 +26,10 @@ public class GraphicObjectsHandler
     {
         _storageTools = new StorageTools(selectedFile);
         if (!_storageTools.IsFileExists()) return;
+        BankOfIds.GetInstance().Clear();
         try
         {
+            _graphicObjects = new GraphicObjectsList();
             _graphicObjectsListObserver = new GraphicObjectsListObserverTreeViewUpdater(_graphicObjects);
             _graphicObjectsListObserver.TreeNeedUpdate += ThrowTreeUpdate;
             _graphicObjects.ParseGraphicObjects(_storageTools.GetFormattedDataFromStorage(),
@@ -79,9 +81,9 @@ public class GraphicObjectsHandler
         {
             if (i.Current.IsObjectSelected() && i.Current.IsGroup())
             {
-                var currentGroupList = ((GraphicObjectGroup) i.Current).GetAllGraphicObjects();
-                _graphicObjects.InsertListBeforePointer(currentGroupList, i);
-                i.Current.ReturnIdToBank();
+                var currentGroup = ((GraphicObjectGroup) i.Current);
+                _graphicObjects.InsertListBeforePointer(currentGroup.GetAllGraphicObjects(), i);
+                currentGroup.ReturnOnlyGroupIdToBank();
                 _graphicObjects.RemovePointerElement(i);
             }
         }
@@ -221,12 +223,7 @@ public class GraphicObjectsHandler
         {
             if (i.Current.IsObjectSelected())
             {
-                if (i.Current.IsGroup())
-                {
-                    var currentGroup = ((GraphicObjectGroup) i.Current);
-                    currentGroup.ReturnAllIdsToBank();
-                }
-
+                i.Current.ReturnIdToBank();
                 _graphicObjects.RemovePointerElement(i);
             }
         }

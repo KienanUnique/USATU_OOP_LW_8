@@ -6,7 +6,7 @@ public class BankOfIds
 {
     private static BankOfIds _bankOfIds;
     private static SortedSet<int> _usedIds;
-    private const int FirstIp = 0;
+    private const int FirstId = 0;
 
     private BankOfIds()
     {
@@ -25,7 +25,7 @@ public class BankOfIds
 
     public int GetId()
     {
-        int freeId = FirstIp;
+        int freeId = FirstId;
         while (_usedIds.Contains(freeId))
         {
             freeId++;
@@ -38,5 +38,10 @@ public class BankOfIds
     public void ReturnId(int returnedId)
     {
         _usedIds.Remove(returnedId);
+    }
+
+    public void Clear()
+    {
+        _usedIds.Clear();
     }
 }

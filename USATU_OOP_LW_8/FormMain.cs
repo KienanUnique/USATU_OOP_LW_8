@@ -9,7 +9,7 @@ namespace USATU_OOP_LW_8
         private const int ChangeSizeK = 2;
         private const int MoveLength = 10;
         private readonly Color _startColor = Color.Coral;
-        private GraphicObjectsHandler _graphicObjectsHandler;
+        private readonly GraphicObjectsHandler _graphicObjectsHandler;
         private bool _wasControlAlreadyPressed;
         private bool _wasFileLoaded = false;
 

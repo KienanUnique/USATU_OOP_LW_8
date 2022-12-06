@@ -153,7 +153,11 @@ namespace USATU_OOP_LW_8
             _graphicObjects.Add(newGraphicObject);
         }
 
-        public void ReturnAllIdsToBank()
+        public void ReturnOnlyGroupIdToBank()
+        {
+            base.ReturnIdToBank();
+        }
+        public override void ReturnIdToBank()
         {
             for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
             {
