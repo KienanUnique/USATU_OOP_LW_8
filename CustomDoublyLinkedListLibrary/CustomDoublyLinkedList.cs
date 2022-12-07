@@ -87,7 +87,6 @@ namespace CustomDoublyLinkedListLibrary
 
         public virtual void RemovePointerElement(PointerCustomDoublyLinkedList<T> pointer)
         {
-            pointer.CurrentElement.Object = default;
             switch (pointer.CurrentElement.Next.IsBorder)
             {
                 case true when !pointer.CurrentElement.Previous.IsBorder:
@@ -168,6 +167,19 @@ namespace CustomDoublyLinkedListLibrary
 
             Count += listToInsert.Count;
         }
+
+        public bool Contains(T valueToSearch)
+        {
+            for (var i = GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
+            {
+                if (i.Current.Equals(valueToSearch))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 
     public class PointerCustomDoublyLinkedList<T>
@@ -183,6 +195,15 @@ namespace CustomDoublyLinkedListLibrary
         internal PointerCustomDoublyLinkedList(CustomDoublyLinkedList<T>.DoublyLinkedElement startElement) =>
             CurrentElement = startElement;
 
+        public PointerCustomDoublyLinkedList<T> GetPointerOnNextElement()
+        {
+            return new PointerCustomDoublyLinkedList<T>(CurrentElement.Next);
+        }
+        
+        public PointerCustomDoublyLinkedList<T> GetPointerOnPreviousElement()
+        {
+            return new PointerCustomDoublyLinkedList<T>(CurrentElement.Previous);
+        }
 
         public void MoveNext()
         {

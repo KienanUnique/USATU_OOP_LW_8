@@ -12,7 +12,8 @@ namespace USATU_OOP_LW_8
         Triangle,
         Square,
         Pentagon,
-        Group
+        Group,
+        StickySquare
     }
 
     public static class SelectionBorder
@@ -39,6 +40,7 @@ namespace USATU_OOP_LW_8
         protected Rectangle FigureRectangle;
         protected readonly SolidBrush CurrentBrush;
         protected abstract GraphicObjectsTypes GraphicObjectsType { get; }
+        public override bool IsGroup => false;
 
         private readonly Size _defaultSize = new Size(50, 50);
         private readonly Point _defaultLocation = new Point(0, 0);
@@ -56,10 +58,6 @@ namespace USATU_OOP_LW_8
         {
             FigureRectangle = new Rectangle(_defaultLocation, _defaultSize);
             CurrentBrush = new SolidBrush(_defaultColor);
-        }
-
-        ~Figure()
-        {
         }
 
         protected Figure(Color color, Point centerLocation)
@@ -133,7 +131,7 @@ namespace USATU_OOP_LW_8
             return !(IsFigureOutside(GetMovedFigureRectangle(moveVector), backgroundSize));
         }
 
-        public override void Move(Point moveVector)
+        public override void MoveWithoutNotifying(Point moveVector)
         {
             FigureRectangle = GetMovedFigureRectangle(moveVector);
         }
@@ -186,11 +184,6 @@ namespace USATU_OOP_LW_8
                    backgroundSize.Height < figureRectangle.Bottom || figureRectangle.Top < 0;
         }
 
-        public override bool IsGroup()
-        {
-            return false;
-        }
-
         public override string PrepareDataToStore()
         {
             var dataStringBuilder = new StringBuilder();
@@ -206,8 +199,32 @@ namespace USATU_OOP_LW_8
 
     public class Circle : Figure
     {
+        private const int CountOfPoints = 16;
+        private int CircleRadius => FigureRectangle.Width / 2;
+        public override bool IsSticky => false;
+
+        private Point CircleCenter => new Point(FigureRectangle.X + FigureRectangle.Width / 2,
+            FigureRectangle.Y + FigureRectangle.Height / 2);
+
         protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.Circle;
         protected override string NamePrefix => "Circle";
+
+        public override Point[] ContourPoints
+        {
+            get
+            {
+                var contourPoints = new Point[CountOfPoints];
+                double currentAngle = 0;
+                for (int i = 0; i < CountOfPoints; i++)
+                {
+                    contourPoints[i] = new Point((int) (CircleRadius * Math.Sin(currentAngle) + CircleCenter.X),
+                        (int) ((CircleRadius * Math.Cos(currentAngle) + CircleCenter.Y)));
+                    currentAngle += Math.PI * 2 / CountOfPoints;
+                }
+
+                return contourPoints;
+            }
+        }
 
         public Circle(Color color, Point location) : base(color, location)
         {
@@ -219,10 +236,9 @@ namespace USATU_OOP_LW_8
 
         public override bool IsPointInside(Point pointToCheck)
         {
-            var circleRadius = FigureRectangle.Width / 2;
-            var tmpX = pointToCheck.X - FigureRectangle.Location.X - circleRadius;
-            var tmpY = pointToCheck.Y - FigureRectangle.Location.Y - circleRadius;
-            return tmpX * tmpX + tmpY * tmpY <= circleRadius * circleRadius;
+            var tmpX = pointToCheck.X - CircleCenter.X;
+            var tmpY = pointToCheck.Y - CircleCenter.Y;
+            return tmpX * tmpX + tmpY * tmpY <= CircleRadius * CircleRadius;
         }
 
         protected override void DrawFigureOnGraphics(Graphics graphics)
@@ -235,6 +251,15 @@ namespace USATU_OOP_LW_8
     {
         protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.Square;
         protected override string NamePrefix => "Square";
+        public override bool IsSticky => false;
+
+        public override Point[] ContourPoints => new Point[]
+        {
+            new Point(FigureRectangle.Left, FigureRectangle.Top),
+            new Point(FigureRectangle.Right, FigureRectangle.Top),
+            new Point(FigureRectangle.Left, FigureRectangle.Bottom),
+            new Point(FigureRectangle.Right, FigureRectangle.Bottom),
+        };
 
         public Square(Color color, Point location) : base(color, location)
         {
@@ -255,10 +280,39 @@ namespace USATU_OOP_LW_8
         }
     }
 
+    public class StickySquare : Square, IStickyObject
+    {
+        protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.StickySquare;
+        protected override string NamePrefix => "Sticky square";
+        public override bool IsSticky => true;
+        public Point[] ContourStickyPoints => ContourPoints;
+
+        public StickySquare() : base()
+        {
+        }
+
+        public StickySquare(Color color, Point location) : base(color, location)
+        {
+        }
+
+        public bool IsAnyPointInsideStickyObject(Point[] pointsToCheck)
+        {
+            return IsAnyPointInside(pointsToCheck);
+        }
+    }
+
     public class Triangle : Figure
     {
         protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.Triangle;
         protected override string NamePrefix => "Triangle";
+        public override bool IsSticky => false;
+
+        public override Point[] ContourPoints => new Point[]
+        {
+            new Point(FigureRectangle.Left, FigureRectangle.Top),
+            new Point(FigureRectangle.Left, FigureRectangle.Bottom),
+            new Point(FigureRectangle.Right, FigureRectangle.Bottom)
+        };
 
         public Triangle(Color color, Point location) : base(color, location)
         {
@@ -271,18 +325,12 @@ namespace USATU_OOP_LW_8
         public override bool IsPointInside(Point pointToCheck)
         {
             return (FigureRectangle.Contains(pointToCheck) && IsUnderLine(FigureRectangle.Location,
-                new Point(FigureRectangle.Location.X + FigureRectangle.Width,
-                    FigureRectangle.Location.Y + FigureRectangle.Height), pointToCheck));
+                new Point(FigureRectangle.Right, FigureRectangle.Bottom), pointToCheck));
         }
 
         protected override void DrawFigureOnGraphics(Graphics graphics)
         {
-            Point[] points =
-            {
-                FigureRectangle.Location, new Point(FigureRectangle.Left, FigureRectangle.Bottom),
-                new Point(FigureRectangle.Right, FigureRectangle.Bottom)
-            };
-            graphics.FillPolygon(CurrentBrush, points);
+            graphics.FillPolygon(CurrentBrush, ContourPoints);
         }
     }
 
@@ -290,6 +338,16 @@ namespace USATU_OOP_LW_8
     {
         protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.Pentagon;
         protected override string NamePrefix => "Pentagon";
+        public override bool IsSticky => false;
+
+        public override Point[] ContourPoints => new Point[]
+        {
+            new Point(FigureRectangle.Left, FigureRectangle.Bottom - FigureRectangle.Height / 2),
+            new Point(FigureRectangle.Right - FigureRectangle.Width / 2, FigureRectangle.Top),
+            new Point(FigureRectangle.Right, FigureRectangle.Bottom - FigureRectangle.Height / 2),
+            new Point(FigureRectangle.Right, FigureRectangle.Bottom),
+            new Point(FigureRectangle.Left, FigureRectangle.Bottom),
+        };
 
         public Pentagon(Color color, Point location) : base(color, location)
         {
@@ -312,15 +370,7 @@ namespace USATU_OOP_LW_8
 
         protected override void DrawFigureOnGraphics(Graphics graphics)
         {
-            Point[] points =
-            {
-                new Point(FigureRectangle.Left, FigureRectangle.Bottom - FigureRectangle.Height / 2),
-                new Point(FigureRectangle.Right - FigureRectangle.Width / 2, FigureRectangle.Top),
-                new Point(FigureRectangle.Right, FigureRectangle.Bottom - FigureRectangle.Height / 2),
-                new Point(FigureRectangle.Right, FigureRectangle.Bottom),
-                new Point(FigureRectangle.Left, FigureRectangle.Bottom),
-            };
-            graphics.FillPolygon(CurrentBrush, points);
+            graphics.FillPolygon(CurrentBrush, ContourPoints);
         }
     }
 }

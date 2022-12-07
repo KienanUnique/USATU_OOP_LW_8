@@ -22,7 +22,7 @@ public class GraphicObjectsListObserverTreeViewUpdater
         TreeNeedUpdate?.Invoke(nodes);
     }
 
-    public void ProcessTreeActionToObjects(TreeNode selectedNode, bool isChecked)
+    public void ProcessTreeSelectionToObjects(TreeNode selectedNode, bool isChecked)
     {
         int lastIndex = 0;
         var currentNode = selectedNode;
@@ -56,7 +56,7 @@ public class GraphicObjectsListObserverTreeViewUpdater
         for (; !pointer.IsBorderReached(); pointer.MoveNext())
         {
             var tmpTreeNode = new TreeNode();
-            if (pointer.Current.IsGroup())
+            if (pointer.Current.IsGroup)
             {
                 var currentGroupList = ((GraphicObjectGroup) pointer.Current).GetAllGraphicObjects();
                 tmpTreeNode = ConvertCustomListToTreeNodes(currentGroupList.GetPointerOnBeginning());

@@ -96,6 +96,10 @@ namespace USATU_OOP_LW_8
             {
                 return GraphicObjectsTypes.Pentagon;
             }
+            else if (radioButtonStickySquare.Checked)
+            {
+                return GraphicObjectsTypes.StickySquare;
+            }
 
             return GraphicObjectsTypes.None;
         }
