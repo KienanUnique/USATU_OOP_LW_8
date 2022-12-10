@@ -40,6 +40,7 @@ public class GraphicObjectsHandler
             // ignored
         }
 
+        ProcessGraphicObjectsIntersections();
         _graphicObjectsListObserver.UpdateChanges();
     }
 
@@ -227,7 +228,7 @@ public class GraphicObjectsHandler
             if (i.Current.IsObjectSelected())
             {
                 i.Current.ReturnIdToBank();
-                i.Current.UnstickFromStuckGraphicObjects();
+                i.Current.UnstickFromAllStuckGraphicObjects();
                 _graphicObjects.RemovePointerElement(i);
             }
         }

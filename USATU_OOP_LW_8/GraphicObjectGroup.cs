@@ -26,20 +26,6 @@ namespace USATU_OOP_LW_8
             }
         }
 
-        /*public bool IsAnyPointInsideStickyObject(Point[] pointsToCheck)
-        {
-            for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-            {
-                if (!i.Current.IsSticky) continue;
-                var stickyObject = (IStickyObject) i.Current;
-                if (stickyObject.IsAnyPointInsideStickyObject(pointsToCheck))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }*/
-
         public GraphicObjectGroup(GraphicObjectsAbstractFactory graphicObjectsFactory)
         {
             _graphicObjectsFactory = graphicObjectsFactory;

@@ -4,12 +4,6 @@ using System.Linq;
 
 namespace USATU_OOP_LW_8;
 
-public enum ResizeAction
-{
-    Increase,
-    Decrease
-}
-
 public abstract class GraphicObject
 {
     public readonly int Id = BankOfIds.GetInstance().GetId();
@@ -45,26 +39,25 @@ public abstract class GraphicObject
     public void Move(Point moveVector, Size backgroundSize)
     {
         CanBeNotifiedMoved = false;
-        _stickyShapesObservable.NotifyStuckObjectsAboutMoving(Id, moveVector, backgroundSize);
+        _stickyShapesObservable.NotifyStuckObjectsAboutMoving(moveVector, backgroundSize);
         MoveWithoutNotifying(moveVector);
-        CanBeNotifiedMoved = true;
-        _stickyShapesObservable.ResetAllCanBeNotifiedMovedFlags();
-    }
-
-    public bool IsAnyPointInside(Point[] pointsToCheck)
-    {
-        return pointsToCheck.Any(point => IsPointInside(point));
+        ResetCanBeNotifiedMoved();
     }
 
     public void TryMove(Point moveVector, Size backgroundSize)
     {
         if (!CanBeNotifiedMoved) return;
         CanBeNotifiedMoved = false;
-        _stickyShapesObservable.NotifyStuckObjectsAboutMoving(Id, moveVector, backgroundSize);
+        _stickyShapesObservable.NotifyStuckObjectsAboutMoving(moveVector, backgroundSize);
         if (IsMovePossible(moveVector, backgroundSize))
         {
             MoveWithoutNotifying(moveVector);
         }
+    }
+
+    public bool IsAnyPointInside(Point[] pointsToCheck)
+    {
+        return pointsToCheck.Any(IsPointInside);
     }
 
     public string GetName()
@@ -79,10 +72,7 @@ public abstract class GraphicObject
 
     public void StickNewGraphicObject(GraphicObject newGraphicObject)
     {
-        if (!IsObjectAlreadyStuck(newGraphicObject.Id))
-        {
-            _stickyShapesObservable.StickNewGraphicObject(newGraphicObject);
-        }
+        _stickyShapesObservable.StickNewGraphicObject(newGraphicObject);
     }
 
     public bool IsObjectAlreadyStuck(int graphicObjectIdToCheck)
@@ -95,75 +85,8 @@ public abstract class GraphicObject
         _stickyShapesObservable.UnstickGraphicObjectById(unstuckGraphicObjectId);
     }
 
-    public void UnstickFromStuckGraphicObjects()
+    public void UnstickFromAllStuckGraphicObjects()
     {
-        _stickyShapesObservable.UnstickFromStuckGraphicObjects(Id);
-    }
-}
-
-public class StickyShapesObservable
-{
-    private readonly GraphicObjectsList _stuckObjectsList = new();
-
-    public void StickNewGraphicObject(GraphicObject newGraphicObject)
-    {
-        _stuckObjectsList.Add(newGraphicObject);
-    }
-
-    public bool IsObjectAlreadyStuck(int graphicObjectIdToCheck)
-    {
-        for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-        {
-            if (i.Current.Id == graphicObjectIdToCheck)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public void UnstickGraphicObjectById(int unstuckGraphicObjectId)
-    {
-        for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-        {
-            if (i.Current.Id == unstuckGraphicObjectId)
-            {
-                _stuckObjectsList.RemovePointerElement(i);
-            }
-        }
-    }
-
-    public void UnstickFromStuckGraphicObjects(int thisId)
-    {
-        var pointer = _stuckObjectsList.GetPointerOnBeginning();
-        while (!pointer.IsBorderReached())
-        {
-            pointer.Current.UnstickGraphicObjectById(thisId);
-            _stuckObjectsList.RemovePointerElement(pointer);
-            pointer.MoveNext();
-        }
-    }
-
-    public void NotifyStuckObjectsAboutMoving(int thisId, Point moveVector, Size backgroundSize)
-    {
-        for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-        {
-            if (i.Current.Id != thisId && i.Current.CanBeNotifiedMoved)
-            {
-                i.Current.TryMove(moveVector, backgroundSize);
-            }
-        }
-    }
-
-    public void ResetAllCanBeNotifiedMovedFlags()
-    {
-        for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-        {
-            if (!i.Current.CanBeNotifiedMoved)
-            {
-                i.Current.ResetCanBeNotifiedMoved();
-            }
-        }
+        _stickyShapesObservable.UnstickFromAllStuckGraphicObjects(Id);
     }
 }
