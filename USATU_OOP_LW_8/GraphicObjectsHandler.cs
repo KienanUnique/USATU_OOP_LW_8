@@ -14,6 +14,7 @@ public class GraphicObjectsHandler
     private bool _isMultipleSelectionEnabled;
     private readonly Size _backgroundSize;
     private readonly GraphicObjectsAbstractFactory _graphicObjectsFactory = new GraphicObjectsFactory();
+    private readonly FiguresAbstractFactory _figuresFactory = new FiguresFactory();
     private StorageTools _storageTools;
     private GraphicObjectsListObserverTreeViewUpdater _graphicObjectsListObserver;
 
@@ -133,25 +134,9 @@ public class GraphicObjectsHandler
         return wasOnObject;
     }
 
-    public void AddFigure(GraphicObjectsTypes graphicObjectsTypeType, Color color, Point location)
+    public void AddFigure(Enum graphicObjectsTypeType, Color color, Point location)
     {
-        Figure newFigure = null; // TODO: use FiguresFactory
-        switch (graphicObjectsTypeType)
-        {
-            case GraphicObjectsTypes.Circle:
-                newFigure = new Circle(color, location);
-                break;
-            case GraphicObjectsTypes.Square:
-                newFigure = new Square(color, location);
-                break;
-            case GraphicObjectsTypes.Triangle:
-                newFigure = new Triangle(color, location);
-                break;
-            case GraphicObjectsTypes.Pentagon:
-                newFigure = new Pentagon(color, location);
-                break;
-        }
-
+        Figure newFigure = _figuresFactory.ParseFigure(graphicObjectsTypeType, color, location);
         if (!newFigure.IsFigureOutside(_backgroundSize))
         {
             _graphicObjects.Add(newFigure);
