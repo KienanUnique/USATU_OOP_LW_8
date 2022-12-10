@@ -134,7 +134,7 @@ public class GraphicObjectsHandler
 
     public void AddFigure(GraphicObjectsTypes graphicObjectsTypeType, Color color, Point location)
     {
-        Figure newFigure = null;
+        Figure newFigure = null; // TODO: use FiguresFactory
         switch (graphicObjectsTypeType)
         {
             case GraphicObjectsTypes.Circle:
@@ -148,9 +148,6 @@ public class GraphicObjectsHandler
                 break;
             case GraphicObjectsTypes.Pentagon:
                 newFigure = new Pentagon(color, location);
-                break;
-            case GraphicObjectsTypes.StickySquare:
-                newFigure = new StickySquare(color, location);
                 break;
         }
 
@@ -287,40 +284,22 @@ public class GraphicObjectsHandler
             for (var j = i.GetPointerOnNextElement(); !j.IsBorderReached(); j.MoveNext())
             {
                 if (j.Current.Id != i.Current.Id &&
-                    (i.Current.IsSticky || j.Current.IsSticky) &&
-                    (!i.Current.IsObjectAlreadyStuck(j.Current.Id) &&
-                     !j.Current.IsObjectAlreadyStuck(i.Current.Id)))
+                    (!i.Current.IsObjectAlreadyStuck(j.Current.Id) ||
+                     !j.Current.IsObjectAlreadyStuck(i.Current.Id)) &&
+                    (i.Current.IsAnyPointInside(j.Current.ContourPoints) ||
+                     j.Current.IsAnyPointInside(i.Current.ContourPoints)))
                 {
-                    IStickyObject stickyObject = null;
-                    GraphicObject graphicObject = null;
-                    if (i.Current.IsSticky)
-                    {
-                        stickyObject = (IStickyObject) i.Current;
-                        graphicObject = j.Current;
-                    }
-                    else if (j.Current.IsSticky)
-                    {
-                        stickyObject = (IStickyObject) j.Current;
-                        graphicObject = i.Current;
-                    }
-
-                    if (stickyObject.IsAnyPointInsideStickyObject(graphicObject.ContourPoints) ||
-                        graphicObject.IsAnyPointInside(stickyObject.ContourStickyPoints))
-                    {
-                        j.Current.StickNewGraphicObject(i.Current);
-                        i.Current.StickNewGraphicObject(j.Current);
-                    }
+                    j.Current.StickNewGraphicObject(i.Current);
+                    i.Current.StickNewGraphicObject(j.Current);
                 }
                 else if (j.Current.Id != i.Current.Id &&
-                         (i.Current.IsSticky || j.Current.IsSticky) &&
                          (i.Current.IsObjectAlreadyStuck(j.Current.Id) ||
                           j.Current.IsObjectAlreadyStuck(i.Current.Id)) &&
-                         !i.Current.IntersectWithCommonObject(j.Current.GetAllStuckObjects()) &&
                          !i.Current.IsAnyPointInside(j.Current.ContourPoints) &&
                          !j.Current.IsAnyPointInside(i.Current.ContourPoints))
                 {
-                    i.Current.UnstickGraphicObjectById(j.Current.Id);
                     j.Current.UnstickGraphicObjectById(i.Current.Id);
+                    i.Current.UnstickGraphicObjectById(j.Current.Id);
                 }
             }
         }

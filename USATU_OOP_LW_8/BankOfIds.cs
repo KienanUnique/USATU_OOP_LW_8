@@ -4,6 +4,7 @@ namespace USATU_OOP_LW_8;
 
 public class BankOfIds
 {
+    public const int NotExistingId = -1;
     private static BankOfIds _bankOfIds;
     private static SortedSet<int> _usedIds;
     private const int FirstId = 0;
@@ -26,7 +27,7 @@ public class BankOfIds
     public int GetId()
     {
         int freeId = FirstId;
-        while (_usedIds.Contains(freeId))
+        while (_usedIds.Contains(freeId) || _usedIds.Contains(NotExistingId))
         {
             freeId++;
         }

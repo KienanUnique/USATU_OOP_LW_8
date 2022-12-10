@@ -14,7 +14,6 @@ public class GraphicObjectsFactory : GraphicObjectsAbstractFactory
             GraphicObjectsTypes.Square => new Square(),
             GraphicObjectsTypes.Triangle => new Triangle(),
             GraphicObjectsTypes.Pentagon => new Pentagon(),
-            GraphicObjectsTypes.StickySquare => new StickySquare(),
             _ => null
         };
 

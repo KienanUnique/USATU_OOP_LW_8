@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
 using System.Linq;
-using CustomDoublyLinkedListLibrary;
 
 namespace USATU_OOP_LW_8;
 
@@ -19,9 +17,16 @@ public abstract class GraphicObject
     protected abstract string NamePrefix { get; }
     public abstract Point[] ContourPoints { get; }
     protected const string PrefixGraphicObjectsType = "Type: ";
-    private readonly StickyShapesObservable _stickyShapesObservable = new StickyShapesObservable();
-    public abstract bool IsSticky { get; }
+    private readonly StickyShapesObservable _stickyShapesObservable = new();
+    public bool CanBeNotifiedMoved { get; private set; } = true;
     public abstract bool IsGroup { get; }
+
+    public void ResetCanBeNotifiedMoved()
+    {
+        CanBeNotifiedMoved = true;
+        _stickyShapesObservable.ResetAllCanBeNotifiedMovedFlags();
+    }
+
     public abstract bool IsFigureOutside(Size backgroundSize);
     public abstract void Color(Color newColor);
     public abstract bool IsResizePossible(int sizeK, ResizeAction resizeAction, Size backgroundSize);
@@ -39,8 +44,11 @@ public abstract class GraphicObject
 
     public void Move(Point moveVector, Size backgroundSize)
     {
-        _stickyShapesObservable.NotifyAllAboutMoving(Id, moveVector, backgroundSize);
+        CanBeNotifiedMoved = false;
+        _stickyShapesObservable.NotifyStuckObjectsAboutMoving(Id, moveVector, backgroundSize);
         MoveWithoutNotifying(moveVector);
+        CanBeNotifiedMoved = true;
+        _stickyShapesObservable.ResetAllCanBeNotifiedMovedFlags();
     }
 
     public bool IsAnyPointInside(Point[] pointsToCheck)
@@ -48,10 +56,11 @@ public abstract class GraphicObject
         return pointsToCheck.Any(point => IsPointInside(point));
     }
 
-    public void NotifiedTryMoveWithExceptions(Point moveVector, Size backgroundSize,
-        CustomDoublyLinkedList<int> otherExceptions)
+    public void TryMove(Point moveVector, Size backgroundSize)
     {
-        _stickyShapesObservable.NotifyAllAboutMovingWithExceptions(Id, moveVector, backgroundSize, otherExceptions);
+        if (!CanBeNotifiedMoved) return;
+        CanBeNotifiedMoved = false;
+        _stickyShapesObservable.NotifyStuckObjectsAboutMoving(Id, moveVector, backgroundSize);
         if (IsMovePossible(moveVector, backgroundSize))
         {
             MoveWithoutNotifying(moveVector);
@@ -70,34 +79,10 @@ public abstract class GraphicObject
 
     public void StickNewGraphicObject(GraphicObject newGraphicObject)
     {
-        _stickyShapesObservable.StickNewGraphicObject(Id, newGraphicObject);
-    }
-
-
-    public bool IntersectWithCommonObject(GraphicObjectsList objectsToCheck)
-    {
-        for (var i = _stickyShapesObservable.GetAllStuckObjects().GetPointerOnBeginning();
-             !i.IsBorderReached();
-             i.MoveNext())
+        if (!IsObjectAlreadyStuck(newGraphicObject.Id))
         {
-            for (var j = objectsToCheck.GetPointerOnBeginning(); !j.IsBorderReached(); j.MoveNext())
-            {
-                if (i.Current.Id == j.Current.Id && (i.Current.IsAnyPointInside(ContourPoints) ||
-                                                     IsAnyPointInside(i.Current.ContourPoints)))
-                {
-                    return true;
-                }
-            }
+            _stickyShapesObservable.StickNewGraphicObject(newGraphicObject);
         }
-
-        return false;
-    }
-
-    public void NotifiedStickNewGraphicObjectWithExceptions(GraphicObject newGraphicObject,
-        CustomDoublyLinkedList<int> otherExceptions)
-    {
-        _stickyShapesObservable.NotifyAllAboutNewObjectStickWithExceptions(Id, newGraphicObject, otherExceptions);
-        _stickyShapesObservable.StickNewGraphicObjectWithoutNotify(Id, newGraphicObject);
     }
 
     public bool IsObjectAlreadyStuck(int graphicObjectIdToCheck)
@@ -110,19 +95,9 @@ public abstract class GraphicObject
         _stickyShapesObservable.UnstickGraphicObjectById(unstuckGraphicObjectId);
     }
 
-    public void UnstickGraphicObjectByIdWithoutNotify(int unstuckGraphicObjectId)
-    {
-        _stickyShapesObservable.UnstickGraphicObjectByIdWithoutNotify(unstuckGraphicObjectId);
-    }
-
     public void UnstickFromStuckGraphicObjects()
     {
         _stickyShapesObservable.UnstickFromStuckGraphicObjects(Id);
-    }
-
-    public GraphicObjectsList GetAllStuckObjects()
-    {
-        return _stickyShapesObservable.GetAllStuckObjects();
     }
 }
 
@@ -130,27 +105,9 @@ public class StickyShapesObservable
 {
     private readonly GraphicObjectsList _stuckObjectsList = new();
 
-    public void StickNewGraphicObject(int thisId, GraphicObject newGraphicObject)
-    {
-        NotifyAllAboutNewObjectStick(thisId, newGraphicObject);
-        StickNewGraphicObjectWithoutNotify(thisId, newGraphicObject);
-    }
-
-    public void StickNewGraphicObjectWithoutNotify(int thisId, GraphicObject newGraphicObject)
+    public void StickNewGraphicObject(GraphicObject newGraphicObject)
     {
         _stuckObjectsList.Add(newGraphicObject);
-        for (var i = newGraphicObject.GetAllStuckObjects().GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-        {
-            if (thisId != i.Current.Id && !IsObjectAlreadyStuck(i.Current.Id))
-            {
-                _stuckObjectsList.Add(i.Current);
-            }
-        }
-    }
-
-    public GraphicObjectsList GetAllStuckObjects()
-    {
-        return _stuckObjectsList;
     }
 
     public bool IsObjectAlreadyStuck(int graphicObjectIdToCheck)
@@ -167,41 +124,6 @@ public class StickyShapesObservable
     }
 
     public void UnstickGraphicObjectById(int unstuckGraphicObjectId)
-    {
-        bool isUnstuckGraphicObjectSticky = false;
-        bool isUnstuckGraphicObjectStickyOnlyOne = true;
-        for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-        {
-            if (i.Current.IsSticky)
-            {
-                if (unstuckGraphicObjectId == i.Current.Id)
-                {
-                    isUnstuckGraphicObjectSticky = true;
-                }
-                else
-                {
-                    isUnstuckGraphicObjectStickyOnlyOne = false;
-                }
-            }
-        }
-
-        if (isUnstuckGraphicObjectSticky && isUnstuckGraphicObjectStickyOnlyOne)
-        {
-            var pointer = _stuckObjectsList.GetPointerOnBeginning();
-            while (!pointer.IsBorderReached())
-            {
-                _stuckObjectsList.RemovePointerElement(pointer);
-                pointer.MoveNext();
-            }
-        }
-        else
-        {
-            NotifyAllAboutUnstuck(unstuckGraphicObjectId);
-            UnstickGraphicObjectByIdWithoutNotify(unstuckGraphicObjectId);
-        }
-    }
-
-    public void UnstickGraphicObjectByIdWithoutNotify(int unstuckGraphicObjectId)
     {
         for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
@@ -223,89 +145,25 @@ public class StickyShapesObservable
         }
     }
 
-    public void NotifyAllAboutMoving(int thisId, Point moveVector, Size backgroundSize)
+    public void NotifyStuckObjectsAboutMoving(int thisId, Point moveVector, Size backgroundSize)
     {
         for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            i.Current.NotifiedTryMoveWithExceptions(moveVector, backgroundSize, GetExceptionsIdsList(thisId));
-        }
-    }
-
-    public void NotifyAllAboutMovingWithExceptions(int thisId, Point moveVector, Size backgroundSize,
-        CustomDoublyLinkedList<int> notifyExceptionIdsList)
-    {
-        for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-        {
-            if (!notifyExceptionIdsList.Contains(i.Current.Id))
+            if (i.Current.Id != thisId && i.Current.CanBeNotifiedMoved)
             {
-                i.Current.NotifiedTryMoveWithExceptions(moveVector, backgroundSize,
-                    GetExceptionsIdsList(thisId, notifyExceptionIdsList));
+                i.Current.TryMove(moveVector, backgroundSize);
             }
         }
     }
 
-    private void NotifyAllAboutNewObjectStick(int thisId, GraphicObject newGraphicObject)
+    public void ResetAllCanBeNotifiedMovedFlags()
     {
         for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            i.Current.NotifiedStickNewGraphicObjectWithExceptions(newGraphicObject, GetExceptionsIdsList(thisId));
-        }
-    }
-
-    public void NotifyAllAboutNewObjectStickWithExceptions(int thisId, GraphicObject newGraphicObject,
-        CustomDoublyLinkedList<int> notifyExceptionIdsList)
-    {
-        for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-        {
-            if (!notifyExceptionIdsList.Contains(i.Current.Id))
+            if (!i.Current.CanBeNotifiedMoved)
             {
-                i.Current.NotifiedStickNewGraphicObjectWithExceptions(newGraphicObject,
-                    GetExceptionsIdsList(thisId, notifyExceptionIdsList));
+                i.Current.ResetCanBeNotifiedMoved();
             }
-        }
-    }
-
-    private CustomDoublyLinkedList<int> GetStuckIdsList()
-    {
-        var idList = new CustomDoublyLinkedList<int>();
-        for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-        {
-            idList.Add(i.Current.Id);
-        }
-
-        return idList;
-    }
-
-    private CustomDoublyLinkedList<int> GetExceptionsIdsList(int thisId)
-    {
-        var idList = GetStuckIdsList();
-        idList.Add(thisId);
-        return idList;
-    }
-
-    private CustomDoublyLinkedList<int> GetExceptionsIdsList(int thisId, CustomDoublyLinkedList<int> otherExceptions)
-    {
-        for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-        {
-            if (!otherExceptions.Contains(i.Current.Id))
-            {
-                otherExceptions.Add(i.Current.Id);
-            }
-        }
-
-        if (!otherExceptions.Contains(thisId))
-        {
-            otherExceptions.Add(thisId);
-        }
-
-        return otherExceptions;
-    }
-
-    private void NotifyAllAboutUnstuck(int unstuckGraphicObjectId)
-    {
-        for (var i = _stuckObjectsList.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-        {
-            i.Current.UnstickGraphicObjectByIdWithoutNotify(unstuckGraphicObjectId);
         }
     }
 }

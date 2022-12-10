@@ -46,7 +46,6 @@
              this.panelForDrawing = new System.Windows.Forms.Panel();
              this.buttonSave = new System.Windows.Forms.Button();
              this.buttonLoad = new System.Windows.Forms.Button();
-             this.radioButtonStickySquare = new System.Windows.Forms.RadioButton();
              this.panelAllPaintObjects.SuspendLayout();
              this.groupBoxChooseFigure.SuspendLayout();
              this.panelColorChoose.SuspendLayout();
@@ -75,25 +74,24 @@
              // 
              // textBoxControlPromts
              // 
-             this.textBoxControlPromts.Location = new System.Drawing.Point(915, 251);
+             this.textBoxControlPromts.Location = new System.Drawing.Point(915, 220);
              this.textBoxControlPromts.Multiline = true;
              this.textBoxControlPromts.Name = "textBoxControlPromts";
              this.textBoxControlPromts.ReadOnly = true;
-             this.textBoxControlPromts.Size = new System.Drawing.Size(150, 178);
+             this.textBoxControlPromts.Size = new System.Drawing.Size(150, 209);
              this.textBoxControlPromts.TabIndex = 7;
              this.textBoxControlPromts.Text = resources.GetString("textBoxControlPromts.Text");
              this.textBoxControlPromts.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
              // 
              // groupBoxChooseFigure
              // 
-             this.groupBoxChooseFigure.Controls.Add(this.radioButtonStickySquare);
              this.groupBoxChooseFigure.Controls.Add(this.radioButtonPentagon);
              this.groupBoxChooseFigure.Controls.Add(this.radioButtonTriangle);
              this.groupBoxChooseFigure.Controls.Add(this.radioButtonSquare);
              this.groupBoxChooseFigure.Controls.Add(this.radioButtonCircle);
              this.groupBoxChooseFigure.Location = new System.Drawing.Point(915, 76);
              this.groupBoxChooseFigure.Name = "groupBoxChooseFigure";
-             this.groupBoxChooseFigure.Size = new System.Drawing.Size(150, 169);
+             this.groupBoxChooseFigure.Size = new System.Drawing.Size(150, 138);
              this.groupBoxChooseFigure.TabIndex = 6;
              this.groupBoxChooseFigure.TabStop = false;
              this.groupBoxChooseFigure.Text = "Current figure:";
@@ -203,15 +201,6 @@
              this.buttonLoad.UseVisualStyleBackColor = true;
              this.buttonLoad.Click += new System.EventHandler(this.buttonLoad_Click);
              // 
-             // radioButtonStickySquare
-             // 
-             this.radioButtonStickySquare.Location = new System.Drawing.Point(6, 139);
-             this.radioButtonStickySquare.Name = "radioButtonStickySquare";
-             this.radioButtonStickySquare.Size = new System.Drawing.Size(104, 24);
-             this.radioButtonStickySquare.TabIndex = 0;
-             this.radioButtonStickySquare.Text = "Sticky square";
-             this.radioButtonStickySquare.UseVisualStyleBackColor = true;
-             // 
              // FormMain
              // 
              this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -233,8 +222,6 @@
              this.panelColorChoose.ResumeLayout(false);
              this.ResumeLayout(false);
          }
-
-         private System.Windows.Forms.RadioButton radioButtonStickySquare;
 
          private System.Windows.Forms.TreeView treeViewGraphicObjects;
 

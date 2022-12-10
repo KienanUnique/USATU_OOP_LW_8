@@ -12,8 +12,7 @@ namespace USATU_OOP_LW_8
         Triangle,
         Square,
         Pentagon,
-        Group,
-        StickySquare
+        Group
     }
 
     public static class SelectionBorder
@@ -201,7 +200,6 @@ namespace USATU_OOP_LW_8
     {
         private const int CountOfPoints = 16;
         private int CircleRadius => FigureRectangle.Width / 2;
-        public override bool IsSticky => false;
 
         private Point CircleCenter => new Point(FigureRectangle.X + FigureRectangle.Width / 2,
             FigureRectangle.Y + FigureRectangle.Height / 2);
@@ -251,7 +249,6 @@ namespace USATU_OOP_LW_8
     {
         protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.Square;
         protected override string NamePrefix => "Square";
-        public override bool IsSticky => false;
 
         public override Point[] ContourPoints => new Point[]
         {
@@ -280,32 +277,10 @@ namespace USATU_OOP_LW_8
         }
     }
 
-    public class StickySquare : Square, IStickyObject
-    {
-        protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.StickySquare;
-        protected override string NamePrefix => "Sticky square";
-        public override bool IsSticky => true;
-        public Point[] ContourStickyPoints => ContourPoints;
-
-        public StickySquare() : base()
-        {
-        }
-
-        public StickySquare(Color color, Point location) : base(color, location)
-        {
-        }
-
-        public bool IsAnyPointInsideStickyObject(Point[] pointsToCheck)
-        {
-            return IsAnyPointInside(pointsToCheck);
-        }
-    }
-
     public class Triangle : Figure
     {
         protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.Triangle;
         protected override string NamePrefix => "Triangle";
-        public override bool IsSticky => false;
 
         public override Point[] ContourPoints => new Point[]
         {
@@ -338,7 +313,6 @@ namespace USATU_OOP_LW_8
     {
         protected override GraphicObjectsTypes GraphicObjectsType => GraphicObjectsTypes.Pentagon;
         protected override string NamePrefix => "Pentagon";
-        public override bool IsSticky => false;
 
         public override Point[] ContourPoints => new Point[]
         {

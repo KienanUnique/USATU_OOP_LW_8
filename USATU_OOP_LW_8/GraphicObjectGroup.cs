@@ -5,12 +5,10 @@ using System.Text;
 
 namespace USATU_OOP_LW_8
 {
-    public class GraphicObjectGroup : GraphicObject, IStickyObject
+    public class GraphicObjectGroup : GraphicObject
     {
         protected override string NamePrefix => "Group";
         public override bool IsGroup => true;
-        public override bool IsSticky => _isSticky;
-        private bool _isSticky;
         private readonly GraphicObjectsList _graphicObjects = new();
         private readonly GraphicObjectsAbstractFactory _graphicObjectsFactory;
 
@@ -28,23 +26,7 @@ namespace USATU_OOP_LW_8
             }
         }
 
-        public Point[] ContourStickyPoints
-        {
-            get
-            {
-                var points = new List<Point>();
-                for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-                {
-                    if (!i.Current.IsSticky) continue;
-                    var stickyObject = (IStickyObject) i.Current;
-                    points.AddRange(stickyObject.ContourStickyPoints);
-                }
-
-                return points.ToArray();
-            }
-        }
-
-        public bool IsAnyPointInsideStickyObject(Point[] pointsToCheck)
+        /*public bool IsAnyPointInsideStickyObject(Point[] pointsToCheck)
         {
             for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
             {
@@ -56,7 +38,7 @@ namespace USATU_OOP_LW_8
                 }
             }
             return false;
-        }
+        }*/
 
         public GraphicObjectGroup(GraphicObjectsAbstractFactory graphicObjectsFactory)
         {
@@ -67,16 +49,7 @@ namespace USATU_OOP_LW_8
         public override void LoadData(StringReader dataStringReader)
         {
             IsSelected = false;
-            _isSticky = false;
             _graphicObjects.ParseGraphicObjects(dataStringReader, _graphicObjectsFactory);
-            for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
-            {
-                if (i.Current.IsSticky)
-                {
-                    _isSticky = true;
-                    break;
-                }
-            }
         }
 
         public override bool IsFigureOutside(Size backgroundSize)
@@ -202,11 +175,6 @@ namespace USATU_OOP_LW_8
         public void AddGraphicObject(GraphicObject newGraphicObject)
         {
             newGraphicObject.Unselect();
-            if (newGraphicObject.IsSticky)
-            {
-                _isSticky = true;
-            }
-
             _graphicObjects.Add(newGraphicObject);
         }
 
