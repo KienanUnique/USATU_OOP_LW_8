@@ -9,7 +9,7 @@ namespace USATU_OOP_LW_8
         private const int ChangeSizeK = 2;
         private const int MoveLength = 10;
         private readonly Color _startColor = Color.Coral;
-        private GraphicObjectsHandler _graphicObjectsHandler;
+        private readonly GraphicObjectsHandler _graphicObjectsHandler;
         private bool _wasControlAlreadyPressed;
         private bool _wasFileLoaded = false;
 
@@ -21,11 +21,18 @@ namespace USATU_OOP_LW_8
             controlCurrentColor.BackColor = _startColor;
             buttonSave.Enabled = false;
             panelAllPaintObjects.Enabled = false;
+            _graphicObjectsHandler = new GraphicObjectsHandler(panelForDrawing.DisplayRectangle.Size);
+            _graphicObjectsHandler.TreeNeedUpdate += treeViewGraphicObjects_NodesChanged;
         }
 
         private void OpenLoadFromFileDialog()
         {
             panelAllPaintObjects.Enabled = false;
+            if (_wasFileLoaded)
+            {
+                panelForDrawing.Paint -= panelForDrawing_Paint;
+            }
+
             OpenFileDialog openFileDialog = new OpenFileDialog();
 
             openFileDialog.InitialDirectory = "C:\\Users\\wi\\Documents\\OOP editor saved files";
@@ -35,20 +42,30 @@ namespace USATU_OOP_LW_8
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                _graphicObjectsHandler =
-                    new GraphicObjectsHandler(panelForDrawing.DisplayRectangle.Size, openFileDialog.FileName);
+                _graphicObjectsHandler.ReadDataFromStorage(openFileDialog.FileName);
                 panelForDrawing.Paint += panelForDrawing_Paint;
                 _wasFileLoaded = true;
                 buttonSave.Enabled = true;
                 panelAllPaintObjects.Enabled = true;
             }
-            else
+            else if (_wasFileLoaded)
             {
-                if (_wasFileLoaded)
-                {
-                    panelAllPaintObjects.Enabled = true;
-                }
+                panelAllPaintObjects.Enabled = true;
+                panelForDrawing.Paint += panelForDrawing_Paint;
             }
+        }
+
+        private void treeViewGraphicObjects_NodesChanged(TreeNode treeNode)
+        {
+            treeViewGraphicObjects.BeginUpdate();
+            treeViewGraphicObjects.Nodes.Clear();
+            for (int i = 0; i < treeNode.GetNodeCount(false); i++)
+            {
+                treeViewGraphicObjects.Nodes.Add(treeNode.Nodes[i]);
+            }
+
+            treeViewGraphicObjects.ExpandAll();
+            treeViewGraphicObjects.EndUpdate();
         }
 
         private void panelForDrawing_Paint(object sender, PaintEventArgs e)
@@ -182,6 +199,12 @@ namespace USATU_OOP_LW_8
         private void buttonLoad_Click(object sender, EventArgs e)
         {
             OpenLoadFromFileDialog();
+        }
+
+        private void treeViewGraphicObjects_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            _graphicObjectsHandler.ProcessTreeActionToObjects(e.Node, e.Node.Checked);
+            panelForDrawing_Update();
         }
     }
 }

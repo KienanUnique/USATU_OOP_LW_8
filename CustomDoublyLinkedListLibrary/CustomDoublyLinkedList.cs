@@ -1,4 +1,6 @@
-﻿namespace CustomDoublyLinkedListLibrary
+﻿using System;
+
+namespace CustomDoublyLinkedListLibrary
 {
     public class CustomDoublyLinkedList<T>
     {
@@ -83,7 +85,7 @@
             Count++;
         }
 
-        public void RemovePointerElement(PointerCustomDoublyLinkedList<T> pointer)
+        public virtual void RemovePointerElement(PointerCustomDoublyLinkedList<T> pointer)
         {
             switch (pointer.CurrentElement.Next.IsBorder)
             {
@@ -105,6 +107,8 @@
 
             pointer.CurrentElement.Previous.Next = pointer.CurrentElement.Next;
             pointer.CurrentElement.Next.Previous = pointer.CurrentElement.Previous;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             Count--;
         }
 
@@ -163,6 +167,19 @@
 
             Count += listToInsert.Count;
         }
+
+        public bool Contains(T valueToSearch)
+        {
+            for (var i = GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
+            {
+                if (i.Current.Equals(valueToSearch))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 
     public class PointerCustomDoublyLinkedList<T>
@@ -178,6 +195,15 @@
         internal PointerCustomDoublyLinkedList(CustomDoublyLinkedList<T>.DoublyLinkedElement startElement) =>
             CurrentElement = startElement;
 
+        public PointerCustomDoublyLinkedList<T> GetPointerOnNextElement()
+        {
+            return new PointerCustomDoublyLinkedList<T>(CurrentElement.Next);
+        }
+        
+        public PointerCustomDoublyLinkedList<T> GetPointerOnPreviousElement()
+        {
+            return new PointerCustomDoublyLinkedList<T>(CurrentElement.Previous);
+        }
 
         public void MoveNext()
         {

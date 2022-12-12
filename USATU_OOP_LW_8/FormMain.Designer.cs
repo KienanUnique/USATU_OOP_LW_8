@@ -32,6 +32,7 @@
              System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
              this.colorDialog = new System.Windows.Forms.ColorDialog();
              this.panelAllPaintObjects = new System.Windows.Forms.Panel();
+             this.treeViewGraphicObjects = new System.Windows.Forms.TreeView();
              this.textBoxControlPromts = new System.Windows.Forms.TextBox();
              this.groupBoxChooseFigure = new System.Windows.Forms.GroupBox();
              this.radioButtonPentagon = new System.Windows.Forms.RadioButton();
@@ -52,22 +53,32 @@
              // 
              // panelAllPaintObjects
              // 
+             this.panelAllPaintObjects.Controls.Add(this.treeViewGraphicObjects);
              this.panelAllPaintObjects.Controls.Add(this.textBoxControlPromts);
              this.panelAllPaintObjects.Controls.Add(this.groupBoxChooseFigure);
              this.panelAllPaintObjects.Controls.Add(this.panelColorChoose);
              this.panelAllPaintObjects.Controls.Add(this.panelForDrawing);
              this.panelAllPaintObjects.Location = new System.Drawing.Point(12, 12);
              this.panelAllPaintObjects.Name = "panelAllPaintObjects";
-             this.panelAllPaintObjects.Size = new System.Drawing.Size(795, 440);
+             this.panelAllPaintObjects.Size = new System.Drawing.Size(1074, 440);
              this.panelAllPaintObjects.TabIndex = 0;
+             // 
+             // treeViewGraphicObjects
+             // 
+             this.treeViewGraphicObjects.CheckBoxes = true;
+             this.treeViewGraphicObjects.Location = new System.Drawing.Point(3, 3);
+             this.treeViewGraphicObjects.Name = "treeViewGraphicObjects";
+             this.treeViewGraphicObjects.Size = new System.Drawing.Size(280, 426);
+             this.treeViewGraphicObjects.TabIndex = 8;
+             this.treeViewGraphicObjects.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeViewGraphicObjects_AfterCheck);
              // 
              // textBoxControlPromts
              // 
-             this.textBoxControlPromts.Location = new System.Drawing.Point(629, 233);
+             this.textBoxControlPromts.Location = new System.Drawing.Point(915, 220);
              this.textBoxControlPromts.Multiline = true;
              this.textBoxControlPromts.Name = "textBoxControlPromts";
              this.textBoxControlPromts.ReadOnly = true;
-             this.textBoxControlPromts.Size = new System.Drawing.Size(150, 196);
+             this.textBoxControlPromts.Size = new System.Drawing.Size(150, 209);
              this.textBoxControlPromts.TabIndex = 7;
              this.textBoxControlPromts.Text = resources.GetString("textBoxControlPromts.Text");
              this.textBoxControlPromts.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -78,9 +89,9 @@
              this.groupBoxChooseFigure.Controls.Add(this.radioButtonTriangle);
              this.groupBoxChooseFigure.Controls.Add(this.radioButtonSquare);
              this.groupBoxChooseFigure.Controls.Add(this.radioButtonCircle);
-             this.groupBoxChooseFigure.Location = new System.Drawing.Point(629, 76);
+             this.groupBoxChooseFigure.Location = new System.Drawing.Point(915, 76);
              this.groupBoxChooseFigure.Name = "groupBoxChooseFigure";
-             this.groupBoxChooseFigure.Size = new System.Drawing.Size(150, 151);
+             this.groupBoxChooseFigure.Size = new System.Drawing.Size(150, 138);
              this.groupBoxChooseFigure.TabIndex = 6;
              this.groupBoxChooseFigure.TabStop = false;
              this.groupBoxChooseFigure.Text = "Current figure:";
@@ -129,7 +140,7 @@
              this.panelColorChoose.Controls.Add(this.buttonChooseColor);
              this.panelColorChoose.Controls.Add(this.controlCurrentColor);
              this.panelColorChoose.Controls.Add(this.labelCurrentColor);
-             this.panelColorChoose.Location = new System.Drawing.Point(629, 3);
+             this.panelColorChoose.Location = new System.Drawing.Point(915, 3);
              this.panelColorChoose.Name = "panelColorChoose";
              this.panelColorChoose.Size = new System.Drawing.Size(150, 67);
              this.panelColorChoose.TabIndex = 5;
@@ -164,7 +175,7 @@
              // panelForDrawing
              // 
              this.panelForDrawing.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-             this.panelForDrawing.Location = new System.Drawing.Point(3, 3);
+             this.panelForDrawing.Location = new System.Drawing.Point(289, 3);
              this.panelForDrawing.Name = "panelForDrawing";
              this.panelForDrawing.Size = new System.Drawing.Size(620, 426);
              this.panelForDrawing.TabIndex = 4;
@@ -195,7 +206,7 @@
              this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
              this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
              this.BackColor = System.Drawing.SystemColors.Control;
-             this.ClientSize = new System.Drawing.Size(819, 498);
+             this.ClientSize = new System.Drawing.Size(1098, 498);
              this.Controls.Add(this.buttonLoad);
              this.Controls.Add(this.buttonSave);
              this.Controls.Add(this.panelAllPaintObjects);
@@ -212,7 +223,9 @@
              this.ResumeLayout(false);
          }
 
-        private System.Windows.Forms.Panel panelAllPaintObjects;
+         private System.Windows.Forms.TreeView treeViewGraphicObjects;
+
+         private System.Windows.Forms.Panel panelAllPaintObjects;
         private System.Windows.Forms.Button buttonSave;
         private System.Windows.Forms.Button buttonLoad;
 

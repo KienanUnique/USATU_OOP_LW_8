@@ -1,14 +1,30 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Text;
-using CustomDoublyLinkedListLibrary;
 
 namespace USATU_OOP_LW_8
 {
     public class GraphicObjectGroup : GraphicObject
     {
+        protected override string NamePrefix => "Group";
+        public override bool IsGroup => true;
         private readonly GraphicObjectsList _graphicObjects = new();
         private readonly GraphicObjectsAbstractFactory _graphicObjectsFactory;
+
+        public override Point[] ContourPoints
+        {
+            get
+            {
+                var points = new List<Point>();
+                for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
+                {
+                    points.AddRange(i.Current.ContourPoints);
+                }
+
+                return points.ToArray();
+            }
+        }
 
         public GraphicObjectGroup(GraphicObjectsAbstractFactory graphicObjectsFactory)
         {
@@ -16,10 +32,10 @@ namespace USATU_OOP_LW_8
             IsSelected = false;
         }
 
-        public override void loadData(StringReader dataStringReader)
+        public override void LoadData(StringReader dataStringReader)
         {
-            _graphicObjects.ParseGraphicObjects(dataStringReader, _graphicObjectsFactory);
             IsSelected = false;
+            _graphicObjects.ParseGraphicObjects(dataStringReader, _graphicObjectsFactory);
         }
 
         public override bool IsFigureOutside(Size backgroundSize)
@@ -77,11 +93,11 @@ namespace USATU_OOP_LW_8
             return true;
         }
 
-        public override void Move(Point moveVector)
+        public override void MoveWithoutNotifying(Point moveVector)
         {
             for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
             {
-                i.Current.Move(moveVector);
+                i.Current.MoveWithoutNotifying(moveVector);
             }
         }
 
@@ -129,11 +145,6 @@ namespace USATU_OOP_LW_8
             return false;
         }
 
-        public override bool IsGroup()
-        {
-            return true;
-        }
-
         public override string PrepareDataToStore()
         {
             var dataStringBuilder = new StringBuilder();
@@ -142,7 +153,7 @@ namespace USATU_OOP_LW_8
             return dataStringBuilder.ToString();
         }
 
-        public CustomDoublyLinkedList<GraphicObject> GetAllGraphicObjects()
+        public GraphicObjectsList GetAllGraphicObjects()
         {
             return _graphicObjects;
         }
@@ -151,6 +162,21 @@ namespace USATU_OOP_LW_8
         {
             newGraphicObject.Unselect();
             _graphicObjects.Add(newGraphicObject);
+        }
+
+        public void ReturnOnlyGroupIdToBank()
+        {
+            base.ReturnIdToBank();
+        }
+
+        public override void ReturnIdToBank()
+        {
+            for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
+            {
+                i.Current.ReturnIdToBank();
+            }
+
+            base.ReturnIdToBank();
         }
 
         private void ChangeAllSelection(bool newIsSelected)

@@ -1,32 +1,58 @@
 ﻿using System;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace USATU_OOP_LW_8;
 
 public class GraphicObjectsHandler
 {
-    private readonly GraphicObjectsList _graphicObjects = new();
+    public delegate void OnTreeNeedUpdate(TreeNode treeNode);
+
+    public event OnTreeNeedUpdate TreeNeedUpdate;
+
+    private GraphicObjectsList _graphicObjects = new();
     private bool _isMultipleSelectionEnabled;
     private readonly Size _backgroundSize;
     private readonly GraphicObjectsAbstractFactory _graphicObjectsFactory = new GraphicObjectsFactory();
-    private readonly StorageTools _storageTools;
+    private readonly FiguresAbstractFactory _figuresFactory = new FiguresFactory();
+    private StorageTools _storageTools;
+    private GraphicObjectsListObserverTreeViewUpdater _graphicObjectsListObserver;
 
-    public GraphicObjectsHandler(Size backgroundSize, string selectedFile)
+    public GraphicObjectsHandler(Size backgroundSize)
     {
         _backgroundSize = backgroundSize;
+    }
+
+    public void ReadDataFromStorage(string selectedFile)
+    {
         _storageTools = new StorageTools(selectedFile);
-        if (_storageTools.IsFileExists())
+        if (!_storageTools.IsFileExists()) return;
+        BankOfIds.GetInstance().Clear();
+        try
         {
-            try
-            {
-                _graphicObjects.ParseGraphicObjects(_storageTools.GetFormattedDataFromStorage(),
-                    _graphicObjectsFactory);
-            }
-            catch (Exception e)
-            {
-                // ignored
-            }
+            _graphicObjects = new GraphicObjectsList();
+            _graphicObjectsListObserver = new GraphicObjectsListObserverTreeViewUpdater(_graphicObjects);
+            _graphicObjectsListObserver.TreeNeedUpdate += ThrowTreeUpdate;
+            _graphicObjects.ParseGraphicObjects(_storageTools.GetFormattedDataFromStorage(),
+                _graphicObjectsFactory);
         }
+        catch (Exception)
+        {
+            // ignored
+        }
+
+        ProcessGraphicObjectsIntersections();
+        _graphicObjectsListObserver.UpdateChanges();
+    }
+
+    private void ThrowTreeUpdate(TreeNode treeNode)
+    {
+        TreeNeedUpdate?.Invoke(treeNode);
+    }
+
+    public void ProcessTreeActionToObjects(TreeNode selectedNode, bool isChecked)
+    {
+        _graphicObjectsListObserver.ProcessTreeSelectionToObjects(selectedNode, isChecked);
     }
 
     public void JoinSelectedGraphicObject()
@@ -48,21 +74,24 @@ public class GraphicObjectsHandler
 
         _graphicObjects.Add(newGraphicObjectGroup);
         UnselectAll();
+        _graphicObjectsListObserver.UpdateChanges();
     }
 
     public void SeparateSelectedGraphicObjects()
     {
         for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            if (i.Current.IsObjectSelected() && i.Current.IsGroup())
+            if (i.Current.IsObjectSelected() && i.Current.IsGroup)
             {
-                var currentGroupList = ((GraphicObjectGroup) i.Current).GetAllGraphicObjects();
-                _graphicObjects.InsertListBeforePointer(currentGroupList, i);
+                var currentGroup = ((GraphicObjectGroup) i.Current);
+                _graphicObjects.InsertListBeforePointer(currentGroup.GetAllGraphicObjects(), i);
+                currentGroup.ReturnOnlyGroupIdToBank();
                 _graphicObjects.RemovePointerElement(i);
             }
         }
 
         UnselectAll();
+        _graphicObjectsListObserver.UpdateChanges();
     }
 
     public void DrawOnGraphics(Graphics graphics)
@@ -97,6 +126,7 @@ public class GraphicObjectsHandler
                 }
 
                 i.Current.ProcessClick();
+                _graphicObjectsListObserver.UpdateChanges();
                 break;
             }
         }
@@ -104,31 +134,17 @@ public class GraphicObjectsHandler
         return wasOnObject;
     }
 
-    public void AddFigure(GraphicObjectsTypes graphicObjectsTypeType, Color color, Point location)
+    public void AddFigure(Enum graphicObjectsTypeType, Color color, Point location)
     {
-        Figure newFigure = null;
-        switch (graphicObjectsTypeType)
-        {
-            case GraphicObjectsTypes.Circle:
-                newFigure = new Circle(color, location);
-                break;
-            case GraphicObjectsTypes.Square:
-                newFigure = new Square(color, location);
-                break;
-            case GraphicObjectsTypes.Triangle:
-                newFigure = new Triangle(color, location);
-                break;
-            case GraphicObjectsTypes.Pentagon:
-                newFigure = new Pentagon(color, location);
-                break;
-        }
-
+        Figure newFigure = _figuresFactory.ParseFigure(graphicObjectsTypeType, color, location);
         if (!newFigure.IsFigureOutside(_backgroundSize))
         {
             _graphicObjects.Add(newFigure);
+            ProcessGraphicObjectsIntersections();
         }
 
         UnselectAll();
+        _graphicObjectsListObserver.UpdateChanges();
     }
 
     public void ProcessColorClick(Point clickLocation, Color color)
@@ -173,6 +189,7 @@ public class GraphicObjectsHandler
             if (i.Current.IsObjectSelected() && i.Current.IsResizePossible(changeSizeK, resizeAction, _backgroundSize))
             {
                 i.Current.Resize(changeSizeK, resizeAction);
+                ProcessGraphicObjectsIntersections();
             }
         }
     }
@@ -183,7 +200,8 @@ public class GraphicObjectsHandler
         {
             if (i.Current.IsObjectSelected() && i.Current.IsMovePossible(moveVector, _backgroundSize))
             {
-                i.Current.Move(moveVector);
+                i.Current.Move(moveVector, _backgroundSize);
+                ProcessGraphicObjectsIntersections();
             }
         }
     }
@@ -194,9 +212,13 @@ public class GraphicObjectsHandler
         {
             if (i.Current.IsObjectSelected())
             {
+                i.Current.ReturnIdToBank();
+                i.Current.UnstickFromAllStuckGraphicObjects();
                 _graphicObjects.RemovePointerElement(i);
             }
         }
+
+        _graphicObjectsListObserver.UpdateChanges();
     }
 
     public void StoreData()
@@ -206,12 +228,19 @@ public class GraphicObjectsHandler
 
     private void UnselectAll()
     {
+        bool needObserverUpdate = false;
         for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
             if (i.Current.IsObjectSelected())
             {
                 i.Current.Unselect();
+                needObserverUpdate = true;
             }
+        }
+
+        if (needObserverUpdate)
+        {
+            _graphicObjectsListObserver.UpdateChanges();
         }
     }
 
@@ -232,5 +261,33 @@ public class GraphicObjectsHandler
         }
 
         return true;
+    }
+
+    private void ProcessGraphicObjectsIntersections()
+    {
+        for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
+        {
+            for (var j = i.GetPointerOnNextElement(); !j.IsBorderReached(); j.MoveNext())
+            {
+                if (j.Current.Id != i.Current.Id &&
+                    (!i.Current.IsObjectAlreadyStuck(j.Current.Id) ||
+                     !j.Current.IsObjectAlreadyStuck(i.Current.Id)) &&
+                    (i.Current.IsAnyPointInside(j.Current.ContourPoints) ||
+                     j.Current.IsAnyPointInside(i.Current.ContourPoints)))
+                {
+                    j.Current.StickNewGraphicObject(i.Current);
+                    i.Current.StickNewGraphicObject(j.Current);
+                }
+                else if (j.Current.Id != i.Current.Id &&
+                         (i.Current.IsObjectAlreadyStuck(j.Current.Id) ||
+                          j.Current.IsObjectAlreadyStuck(i.Current.Id)) &&
+                         !i.Current.IsAnyPointInside(j.Current.ContourPoints) &&
+                         !j.Current.IsAnyPointInside(i.Current.ContourPoints))
+                {
+                    j.Current.UnstickGraphicObjectById(i.Current.Id);
+                    i.Current.UnstickGraphicObjectById(j.Current.Id);
+                }
+            }
+        }
     }
 }
