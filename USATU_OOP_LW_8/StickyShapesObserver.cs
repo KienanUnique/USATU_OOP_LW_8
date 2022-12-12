@@ -2,7 +2,7 @@
 
 namespace USATU_OOP_LW_8;
 
-public class StickyShapesObservable
+public class StickyShapesObserver
 {
     private readonly GraphicObjectsList _stuckObjectsList = new();
 

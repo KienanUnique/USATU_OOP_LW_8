@@ -69,7 +69,7 @@
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="ResizeAction.cs" />
-        <Compile Include="StickyShapesObservable.cs" />
+        <Compile Include="StickyShapesObserver.cs" />
         <Compile Include="StorageTools.cs" />
         <EmbeddedResource Include="FormMain.resx">
           <DependentUpon>FormMain.cs</DependentUpon>
