@@ -31,7 +31,7 @@ namespace USATU_OOP_LW_8
             }
         }
 
-        public Circle(Color color, Point location) : base(color, location)
+        public Circle(FigureArgument figureArgument) : base(figureArgument)
         {
         }
 
@@ -65,7 +65,7 @@ namespace USATU_OOP_LW_8
             new Point(FigureRectangle.Right, FigureRectangle.Bottom),
         };
 
-        public Square(Color color, Point location) : base(color, location)
+        public Square(FigureArgument figureArgument) : base(figureArgument)
         {
         }
 
@@ -96,7 +96,7 @@ namespace USATU_OOP_LW_8
             new Point(FigureRectangle.Right, FigureRectangle.Bottom)
         };
 
-        public Triangle(Color color, Point location) : base(color, location)
+        public Triangle(FigureArgument figureArgument) : base(figureArgument)
         {
         }
 
@@ -130,7 +130,7 @@ namespace USATU_OOP_LW_8
             new Point(FigureRectangle.Left, FigureRectangle.Bottom),
         };
 
-        public Pentagon(Color color, Point location) : base(color, location)
+        public Pentagon(FigureArgument figureArgument) : base(figureArgument)
         {
         }
 

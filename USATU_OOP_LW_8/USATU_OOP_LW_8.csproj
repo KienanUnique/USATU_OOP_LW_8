@@ -51,6 +51,7 @@
         <Compile Include="Figure.cs" />
         <Compile Include="Figures.cs" />
         <Compile Include="FiguresAbstractFactory.cs" />
+        <Compile Include="FigureArgument.cs" />
         <Compile Include="FiguresFactory.cs" />
         <Compile Include="FormMain.cs">
             <SubType>Form</SubType>

@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Drawing;
 
 namespace USATU_OOP_LW_8;
 
 public class FiguresFactory : FiguresAbstractFactory
 {
-    public override Figure ParseFigure(Enum typeOfObject, Color color, Point location)
+    public override Figure ParseFigure(Enum typeOfObject, FigureArgument figureArgument)
     {
         Figure newFigure = typeOfObject switch
         {
-            GraphicObjectsTypes.Circle => new Circle(color, location),
-            GraphicObjectsTypes.Square => new Square(color, location),
-            GraphicObjectsTypes.Triangle => new Triangle(color, location),
-            GraphicObjectsTypes.Pentagon => new Pentagon(color, location),
+            GraphicObjectsTypes.Circle => new Circle(figureArgument),
+            GraphicObjectsTypes.Square => new Square(figureArgument),
+            GraphicObjectsTypes.Triangle => new Triangle(figureArgument),
+            GraphicObjectsTypes.Pentagon => new Pentagon(figureArgument),
             _ => null
         };
 

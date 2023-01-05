@@ -136,7 +136,7 @@ public class GraphicObjectsHandler
 
     public void AddFigure(Enum graphicObjectsTypeType, Color color, Point location)
     {
-        Figure newFigure = _figuresFactory.ParseFigure(graphicObjectsTypeType, color, location);
+        Figure newFigure = _figuresFactory.ParseFigure(graphicObjectsTypeType, new FigureArgument(color, location));
         if (!newFigure.IsFigureOutside(_backgroundSize))
         {
             _graphicObjects.Add(newFigure);

@@ -7,7 +7,7 @@ namespace USATU_OOP_LW_8;
 public static class SelectionBorder
 {
     private const int SelectionBorderWidth = 5;
-    private static readonly Color SelectionColor = System.Drawing.Color.Black;
+    private static readonly Color SelectionColor = Color.Black;
     private static readonly float[] DashValues = {1, 1};
     private static readonly Pen BorderPen;
 
@@ -48,12 +48,12 @@ public abstract class Figure : GraphicObject
         CurrentBrush = new SolidBrush(_defaultColor);
     }
 
-    protected Figure(Color color, Point centerLocation)
+    protected Figure(FigureArgument figureArgument)
     {
-        var leftTopPoint = new Point(centerLocation.X - _defaultSize.Width / 2,
-            centerLocation.Y - _defaultSize.Height / 2);
+        var leftTopPoint = new Point(figureArgument.CenterLocation.X - _defaultSize.Width / 2,
+            figureArgument.CenterLocation.Y - _defaultSize.Height / 2);
         FigureRectangle = new Rectangle(leftTopPoint, _defaultSize);
-        CurrentBrush = new SolidBrush(color);
+        CurrentBrush = new SolidBrush(figureArgument.FillColor);
     }
 
     public override void LoadData(StringReader dataStringReader)
