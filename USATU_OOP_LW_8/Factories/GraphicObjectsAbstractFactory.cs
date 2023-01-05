@@ -1,4 +1,4 @@
-﻿namespace USATU_OOP_LW_8;
+﻿namespace USATU_OOP_LW_8.Factories;
 
 public abstract class GraphicObjectsAbstractFactory
 {

@@ -1,12 +1,12 @@
 ﻿using System.Drawing;
 
-namespace USATU_OOP_LW_8;
+namespace USATU_OOP_LW_8.Figures;
 
-public struct FigureArgument
+public struct FigureCreationArguments
 {
     public readonly Color FillColor;
     public readonly Point CenterLocation;
 
-    public FigureArgument(Color fillColor, Point centerLocation) =>
+    public FigureCreationArguments(Color fillColor, Point centerLocation) =>
         (FillColor, CenterLocation) = (fillColor, centerLocation);
 }

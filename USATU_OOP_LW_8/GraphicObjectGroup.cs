@@ -2,6 +2,8 @@
 using System.Drawing;
 using System.IO;
 using System.Text;
+using USATU_OOP_LW_8.Enums;
+using USATU_OOP_LW_8.Factories;
 
 namespace USATU_OOP_LW_8
 {
@@ -59,11 +61,11 @@ namespace USATU_OOP_LW_8
             }
         }
 
-        public override bool IsResizePossible(int sizeK, ResizeAction resizeAction, Size backgroundSize)
+        public override bool IsResizePossible(int sizeK, ResizeActionTypes resizeActionTypes, Size backgroundSize)
         {
             for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
             {
-                if (!i.Current.IsResizePossible(sizeK, resizeAction, backgroundSize))
+                if (!i.Current.IsResizePossible(sizeK, resizeActionTypes, backgroundSize))
                 {
                     return false;
                 }
@@ -72,11 +74,11 @@ namespace USATU_OOP_LW_8
             return true;
         }
 
-        public override void Resize(int sizeK, ResizeAction resizeAction)
+        public override void Resize(int sizeK, ResizeActionTypes resizeActionTypes)
         {
             for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
             {
-                i.Current.Resize(sizeK, resizeAction);
+                i.Current.Resize(sizeK, resizeActionTypes);
             }
         }
 

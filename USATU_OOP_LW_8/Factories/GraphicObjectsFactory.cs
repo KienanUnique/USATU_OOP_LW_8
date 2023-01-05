@@ -1,6 +1,8 @@
 ﻿using System;
+using USATU_OOP_LW_8.Enums;
+using USATU_OOP_LW_8.Figures;
 
-namespace USATU_OOP_LW_8;
+namespace USATU_OOP_LW_8.Factories;
 
 public class GraphicObjectsFactory : GraphicObjectsAbstractFactory
 {

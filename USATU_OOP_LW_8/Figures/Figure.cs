@@ -1,8 +1,9 @@
 ﻿using System.Drawing;
 using System.IO;
 using System.Text;
+using USATU_OOP_LW_8.Enums;
 
-namespace USATU_OOP_LW_8;
+namespace USATU_OOP_LW_8.Figures;
 
 public static class SelectionBorder
 {
@@ -48,12 +49,12 @@ public abstract class Figure : GraphicObject
         CurrentBrush = new SolidBrush(_defaultColor);
     }
 
-    protected Figure(FigureArgument figureArgument)
+    protected Figure(FigureCreationArguments figureCreationArguments)
     {
-        var leftTopPoint = new Point(figureArgument.CenterLocation.X - _defaultSize.Width / 2,
-            figureArgument.CenterLocation.Y - _defaultSize.Height / 2);
+        var leftTopPoint = new Point(figureCreationArguments.CenterLocation.X - _defaultSize.Width / 2,
+            figureCreationArguments.CenterLocation.Y - _defaultSize.Height / 2);
         FigureRectangle = new Rectangle(leftTopPoint, _defaultSize);
-        CurrentBrush = new SolidBrush(figureArgument.FillColor);
+        CurrentBrush = new SolidBrush(figureCreationArguments.FillColor);
     }
 
     public override void LoadData(StringReader dataStringReader)
@@ -75,16 +76,16 @@ public abstract class Figure : GraphicObject
 
     public override void Color(Color newColor) => CurrentBrush.Color = newColor;
 
-    private Rectangle GetResizedFigureRectangle(int sizeK, ResizeAction resizeAction)
+    private Rectangle GetResizedFigureRectangle(int sizeK, ResizeActionTypes resizeActionTypes)
     {
         var newFigureRectangle = new Rectangle();
-        switch (resizeAction)
+        switch (resizeActionTypes)
         {
-            case ResizeAction.Increase:
+            case ResizeActionTypes.Increase:
                 newFigureRectangle = new Rectangle(FigureRectangle.Location,
                     new Size(FigureRectangle.Size.Width * sizeK, FigureRectangle.Size.Height * sizeK));
                 break;
-            case ResizeAction.Decrease:
+            case ResizeActionTypes.Decrease:
                 newFigureRectangle = new Rectangle(FigureRectangle.Location,
                     new Size(FigureRectangle.Size.Width / sizeK, FigureRectangle.Size.Height / sizeK));
                 break;
@@ -93,18 +94,18 @@ public abstract class Figure : GraphicObject
         return newFigureRectangle;
     }
 
-    public override bool IsResizePossible(int sizeK, ResizeAction resizeAction, Size backgroundSize)
+    public override bool IsResizePossible(int sizeK, ResizeActionTypes resizeActionTypes, Size backgroundSize)
     {
-        var newFigureRectangle = GetResizedFigureRectangle(sizeK, resizeAction);
+        var newFigureRectangle = GetResizedFigureRectangle(sizeK, resizeActionTypes);
         if (IsFigureOutside(newFigureRectangle, backgroundSize) ||
             newFigureRectangle.Size.Height < _minimumSize.Height ||
             newFigureRectangle.Size.Width < _minimumSize.Width) return false;
         return true;
     }
 
-    public override void Resize(int sizeK, ResizeAction resizeAction)
+    public override void Resize(int sizeK, ResizeActionTypes resizeActionTypes)
     {
-        FigureRectangle = GetResizedFigureRectangle(sizeK, resizeAction);
+        FigureRectangle = GetResizedFigureRectangle(sizeK, resizeActionTypes);
     }
 
     private Rectangle GetMovedFigureRectangle(Point moveVector)

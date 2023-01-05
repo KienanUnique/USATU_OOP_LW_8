@@ -48,11 +48,18 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="BankOfIds.cs" />
-        <Compile Include="Figure.cs" />
-        <Compile Include="Figures.cs" />
-        <Compile Include="FiguresAbstractFactory.cs" />
-        <Compile Include="FigureArgument.cs" />
-        <Compile Include="FiguresFactory.cs" />
+        <Compile Include="Enums\GraphicObjectsTypes.cs" />
+        <Compile Include="Enums\ResizeActionTypes.cs" />
+        <Compile Include="Factories\FiguresAbstractFactory.cs" />
+        <Compile Include="Factories\FiguresFactory.cs" />
+        <Compile Include="Factories\GraphicObjectsAbstractFactory.cs" />
+        <Compile Include="Factories\GraphicObjectsFactory.cs" />
+        <Compile Include="Figures\Circle.cs" />
+        <Compile Include="Figures\Figure.cs" />
+        <Compile Include="Figures\FigureCreationArguments.cs" />
+        <Compile Include="Figures\Pentagon.cs" />
+        <Compile Include="Figures\Square.cs" />
+        <Compile Include="Figures\Triangle.cs" />
         <Compile Include="FormMain.cs">
             <SubType>Form</SubType>
         </Compile>
@@ -61,16 +68,12 @@
         </Compile>
         <Compile Include="GraphicObject.cs" />
         <Compile Include="GraphicObjectGroup.cs" />
-        <Compile Include="GraphicObjectsAbstractFactory.cs" />
-        <Compile Include="GraphicObjectsFactory.cs" />
         <Compile Include="GraphicObjectsHandler.cs" />
         <Compile Include="GraphicObjectsList.cs" />
-        <Compile Include="GraphicObjectsListObserver.cs" />
-        <Compile Include="GraphicObjectsTypes.cs" />
+        <Compile Include="Observers\GraphicObjectsListObserverTreeViewUpdater.cs" />
+        <Compile Include="Observers\StickyShapesObserver.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="ResizeAction.cs" />
-        <Compile Include="StickyShapesObserver.cs" />
         <Compile Include="StorageTools.cs" />
         <EmbeddedResource Include="FormMain.resx">
           <DependentUpon>FormMain.cs</DependentUpon>

@@ -1,7 +1,7 @@
 ﻿using System.Windows.Forms;
 using CustomDoublyLinkedListLibrary;
 
-namespace USATU_OOP_LW_8;
+namespace USATU_OOP_LW_8.Observers;
 
 public class GraphicObjectsListObserverTreeViewUpdater
 {

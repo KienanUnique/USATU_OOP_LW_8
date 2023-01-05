@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.IO;
 using System.Linq;
+using USATU_OOP_LW_8.Enums;
 
 namespace USATU_OOP_LW_8;
 
@@ -23,8 +24,8 @@ public abstract class GraphicObject
 
     public abstract bool IsFigureOutside(Size backgroundSize);
     public abstract void Color(Color newColor);
-    public abstract bool IsResizePossible(int sizeK, ResizeAction resizeAction, Size backgroundSize);
-    public abstract void Resize(int sizeK, ResizeAction resizeAction);
+    public abstract bool IsResizePossible(int sizeK, ResizeActionTypes resizeActionTypes, Size backgroundSize);
+    public abstract void Resize(int sizeK, ResizeActionTypes resizeActionTypes);
     public abstract bool IsMovePossible(Point moveVector, Size backgroundSize);
     public abstract void MoveWithoutNotifying(Point moveVector);
     public abstract void DrawOnGraphics(Graphics graphics);
