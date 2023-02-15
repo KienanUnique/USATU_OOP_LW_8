@@ -6,7 +6,7 @@ namespace USATU_OOP_LW_8;
 
 public class StorageTools
 {
-    private string _fileName;
+    private readonly string _fileName;
 
     public StorageTools(string fileName) => _fileName = fileName;
 

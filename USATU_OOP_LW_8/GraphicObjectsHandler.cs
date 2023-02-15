@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using USATU_OOP_LW_8.Enums;
+using USATU_OOP_LW_8.Factories;
+using USATU_OOP_LW_8.Figures;
+using USATU_OOP_LW_8.Observers;
 
 namespace USATU_OOP_LW_8;
 
@@ -136,7 +140,7 @@ public class GraphicObjectsHandler
 
     public void AddFigure(Enum graphicObjectsTypeType, Color color, Point location)
     {
-        Figure newFigure = _figuresFactory.ParseFigure(graphicObjectsTypeType, color, location);
+        Figure newFigure = _figuresFactory.ParseFigure(graphicObjectsTypeType, new FigureCreationArguments(color, location));
         if (!newFigure.IsFigureOutside(_backgroundSize))
         {
             _graphicObjects.Add(newFigure);
@@ -182,13 +186,13 @@ public class GraphicObjectsHandler
         }
     }
 
-    public void ResizeSelectedFigures(int changeSizeK, ResizeAction resizeAction)
+    public void ResizeSelectedFigures(int changeSizeK, ResizeActionTypes resizeActionTypes)
     {
         for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            if (i.Current.IsObjectSelected() && i.Current.IsResizePossible(changeSizeK, resizeAction, _backgroundSize))
+            if (i.Current.IsObjectSelected() && i.Current.IsResizePossible(changeSizeK, resizeActionTypes, _backgroundSize))
             {
-                i.Current.Resize(changeSizeK, resizeAction);
+                i.Current.Resize(changeSizeK, resizeActionTypes);
                 ProcessGraphicObjectsIntersections();
             }
         }

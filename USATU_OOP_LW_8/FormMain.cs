@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using USATU_OOP_LW_8.Enums;
 
 namespace USATU_OOP_LW_8
 {
@@ -157,11 +158,11 @@ namespace USATU_OOP_LW_8
                     panelForDrawing_Update();
                     break;
                 case Keys.Oemplus:
-                    _graphicObjectsHandler.ResizeSelectedFigures(ChangeSizeK, ResizeAction.Increase);
+                    _graphicObjectsHandler.ResizeSelectedFigures(ChangeSizeK, ResizeActionTypes.Increase);
                     panelForDrawing_Update();
                     break;
                 case Keys.OemMinus:
-                    _graphicObjectsHandler.ResizeSelectedFigures(ChangeSizeK, ResizeAction.Decrease);
+                    _graphicObjectsHandler.ResizeSelectedFigures(ChangeSizeK, ResizeActionTypes.Decrease);
                     panelForDrawing_Update();
                     break;
                 case Keys.J:
